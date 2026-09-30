@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f8f6">
+  <meta name="description" content="가족 구성원의 건강기록과 병원·복약 일정을 한곳에서 관리하는 건강수첩입니다.">
+  <title>다정한 건강수첩 · 우리 가족 건강관리</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#main-content" aria-label="다정한 건강수첩 홈">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 40 40" fill="none">
+            <rect width="40" height="40" rx="14" fill="currentColor" />
+            <path d="M20 29s-10-5.9-10-13a5.5 5.5 0 0 1 10-3.2A5.5 5.5 0 0 1 30 16c0 7.1-10 13-10 13Z" fill="#fff" />
+            <path d="M14.5 20h3l1.6-3.1 2.2 6.2 1.7-3.1h2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </span>
+        <span class="brand-copy">
+          <strong>다정한 건강수첩</strong>
+          <span>FAMILY HEALTH JOURNAL</span>
+        </span>
+      </a>
+      <div class="topbar-right">
+        <span class="storage-pill">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="storage-status">이 기기에 저장</span>
+        </span>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <section class="welcome-card" aria-labelledby="welcome-title">
+        <div class="welcome-copy">
+          <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>우리 가족 건강 한눈에</p>
+          <h1 id="welcome-title">가족의 건강을<br class="welcome-break"> 다정하게 챙겨요</h1>
+          <p class="welcome-description">건강기록부터 병원 방문과 복약 일정까지,<br class="desktop-only"> 가족 한 사람 한 사람의 건강을 차곡차곡 기록해 보세요.</p>
+        </div>
+        <div class="today-card">
+          <span class="today-label">오늘</span>
+          <time id="today-label" datetime="">날짜를 불러오는 중</time>
+          <span class="today-caption">작은 기록이 건강한 습관이 돼요</span>
+          <span class="today-flower" aria-hidden="true">✳</span>
+        </div>
+        <span class="welcome-orbit orbit-one" aria-hidden="true"></span>
+        <span class="welcome-orbit orbit-two" aria-hidden="true"></span>
+      </section>
+
+      <section class="stats-grid" aria-label="가족 건강 요약">
+        <article class="stat-card stat-members">
+          <span class="stat-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M16 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 18.5V20M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM16 4.2a3.5 3.5 0 0 1 0 6.6M17 15h1.5a3.5 3.5 0 0 1 3.5 3.5V20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span class="stat-copy"><span class="stat-label">가족 구성원</span><strong id="member-count">0<span>명</span></strong></span>
+          <span class="stat-decoration" aria-hidden="true">01</span>
+        </article>
+        <article class="stat-card stat-records">
+          <span class="stat-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M7 3.8h7l4 4V20a1.2 1.2 0 0 1-1.2 1.2H7A1.2 1.2 0 0 1 5.8 20V5A1.2 1.2 0 0 1 7 3.8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 4v4h4M8.5 12h7M8.5 15.5h7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          </span>
+          <span class="stat-copy"><span class="stat-label">건강 기록</span><strong id="record-count">0<span>건</span></strong></span>
+          <span class="stat-decoration" aria-hidden="true">02</span>
+        </article>
+        <article class="stat-card stat-schedules">
+          <span class="stat-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5.5" width="16" height="15" rx="2.2" stroke="currentColor" stroke-width="1.7"/><path d="M8 3.5v4M16 3.5v4M4 10h16M8 14h2M8 17h2M14 14h2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          </span>
+          <span class="stat-copy"><span class="stat-label">다가오는 일정</span><strong id="schedule-count">0<span>건</span></strong></span>
+          <span class="stat-decoration" aria-hidden="true">03</span>
+        </article>
+      </section>
+
+      <div class="workspace">
+        <aside class="family-panel" aria-labelledby="family-title">
+          <div class="panel-heading family-heading">
+            <div>
+              <p class="section-kicker">MY FAMILY</p>
+              <h2 id="family-title">가족 구성원</h2>
+            </div>
+            <button id="add-member-button" class="button button-small button-primary" type="button">
+              <span class="button-plus" aria-hidden="true">+</span><span>등록</span>
+            </button>
+          </div>
+          <div id="family-list" class="family-list" aria-label="등록된 가족 구성원"></div>
+          <div class="family-panel-note">
+            <span class="note-sparkle" aria-hidden="true">✳</span>
+            <p>구성원을 선택하면<br>개인 건강정보를 볼 수 있어요.</p>
+          </div>
+        </aside>
+
+        <section id="member-detail" class="member-detail" aria-label="가족 구성원 건강정보"></section>
+      </div>
+
+      <footer class="app-footer">
+        <span class="footer-heart" aria-hidden="true">♡</span>
+        <p>기록은 현재 브라우저의 저장 공간에 보관됩니다. 브라우저 데이터 삭제 시 함께 지워질 수 있어요.</p>
+        <p class="footer-disclaimer">이 서비스는 개인 건강관리용이며 의료진의 진단이나 응급 진료를 대신하지 않습니다.</p>
+      </footer>
+    </main>
+
+    <dialog id="member-dialog" class="member-dialog" aria-labelledby="member-dialog-title">
+      <form id="member-form" class="dialog-form">
+        <div class="dialog-topline">
+          <span class="section-kicker">가족 건강수첩</span>
+          <button class="icon-button dialog-close" type="button" data-action="close-member-dialog" aria-label="창 닫기">×</button>
+        </div>
+        <h2 id="member-dialog-title">가족 구성원 등록</h2>
+        <p class="dialog-intro">함께 건강을 챙길 가족의 기본 정보를 입력해 주세요.</p>
+
+        <div class="dialog-fields">
+          <label class="field field-full" for="member-name">
+            <span>이름 <span class="required-mark" aria-hidden="true">*</span></span>
+            <input id="member-name" name="name" type="text" maxlength="40" placeholder="이름을 입력해 주세요" autocomplete="off" required>
+          </label>
+          <label class="field" for="member-relationship">
+            <span>관계</span>
+            <select id="member-relationship" name="relationship" required>
+              <option value="본인">본인</option>
+              <option value="배우자">배우자</option>
+              <option value="자녀">자녀</option>
+              <option value="부모님">부모님</option>
+              <option value="형제·자매">형제·자매</option>
+              <option value="기타">기타</option>
+            </select>
+          </label>
+          <label class="field" for="member-birth-date">
+            <span>생년월일</span>
+            <input id="member-birth-date" name="birthDate" type="date">
+          </label>
+          <label class="field" for="member-blood-type">
+            <span>혈액형</span>
+            <select id="member-blood-type" name="bloodType">
+              <option value="unknown">미확인</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+            </select>
+          </label>
+          <label class="field" for="member-allergies">
+            <span>알레르기 · 주의사항</span>
+            <input id="member-allergies" name="allergies" type="text" maxlength="160" placeholder="예: 특정 약물, 음식 알레르기">
+          </label>
+          <label class="field field-full" for="member-note">
+            <span>건강 메모 <span class="optional-label">선택</span></span>
+            <textarea id="member-note" name="note" rows="3" maxlength="500" placeholder="평소 건강 상태나 참고할 내용을 적어 주세요."></textarea>
+          </label>
+        </div>
+        <p class="dialog-privacy">건강정보는 이 브라우저에 저장됩니다. 공용 기기에서는 개인정보 입력에 유의해 주세요.</p>
+        <div class="dialog-actions">
+          <button class="button button-secondary" type="button" data-action="close-member-dialog">취소</button>
+          <button class="button button-primary" type="submit">구성원 등록</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+    <noscript><p class="noscript-message">이 건강수첩을 사용하려면 브라우저에서 JavaScript를 켜 주세요.</p></noscript>
+  </div>
+</body>
+</html>
