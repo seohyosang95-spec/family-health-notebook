@@ -28,6 +28,9 @@
     memberForm: document.getElementById('member-form'),
     memberName: document.getElementById('member-name'),
     memberBirthDate: document.getElementById('member-birth-date'),
+    memberDialogTitle: document.getElementById('member-dialog-title'),
+    memberDialogIntro: document.querySelector('#member-dialog .dialog-intro'),
+    memberFormSubmit: document.querySelector('#member-form button[type="submit"]'),
     toast: document.getElementById('toast')
   };
 
@@ -36,6 +39,7 @@
   let toastTimer = 0;
   const state = loadState();
   let selectedMemberId = state.members.length ? state.members[0].id : null;
+  let editingMemberId = null;
 
   function emptyState() {
     return { members: [], records: [], schedules: [] };
@@ -43,6 +47,12 @@
 
   function textValue(value, maxLength = 600) {
     return typeof value === 'string' ? value.slice(0, maxLength) : '';
+  }
+
+  function normalizeMemberName(value) {
+    return typeof value === 'string'
+      ? value.normalize('NFKC').trim().replace(/\s+/gu, ' ').toLowerCase()
+      : '';
   }
 
   function isISODate(value) {
@@ -282,9 +292,15 @@
               </div>
             </div>
           </div>
-          <div class="profile-stamp" aria-label="개인 건강정보">
+          <div class="profile-stamp">
             <span class="profile-stamp-mark" aria-hidden="true">♡</span>
             <span>개인 건강정보</span>
+            <div class="profile-actions">
+              <button class="button button-small button-secondary" type="button" data-action="edit-member" data-id="${escapeHTML(member.id)}" aria-label="${escapeHTML(member.name)} 정보 수정" title="구성원 정보 수정">수정</button>
+              <button class="icon-button delete-button" type="button" data-action="delete-member" data-id="${escapeHTML(member.id)}" aria-label="${escapeHTML(member.name)} 구성원 삭제" title="구성원 삭제">
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M4.8 6.2h10.4M8 6.2V4.7h4v1.5m-5.7 0 .6 9.1c.1.8.6 1.2 1.4 1.2h3.4c.8 0 1.3-.4 1.4-1.2l.6-9.1M8.3 8.8v4.8m3.4-4.8v4.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
           </div>
         </div>
         <div class="profile-facts">
@@ -496,6 +512,19 @@
     }, 3200);
   }
 
+  function confirmDeletion(message) {
+    try {
+      if (typeof window.confirm !== 'function') {
+        showToast('삭제 확인 창을 사용할 수 없어 삭제하지 않았습니다.', 'warning');
+        return false;
+      }
+      return window.confirm(message) === true;
+    } catch (error) {
+      showToast('삭제 확인 창을 표시하지 못해 삭제하지 않았습니다.', 'warning');
+      return false;
+    }
+  }
+
   function saveRenderAndNotify(successMessage) {
     const saved = saveState();
     renderAll();
@@ -506,13 +535,37 @@
     }
   }
 
-  function openMemberDialog() {
+  function openMemberDialog(memberId = null) {
+    const member = memberId === null ? null : state.members.find((item) => item.id === memberId);
+    if (memberId !== null && !member) {
+      showToast('수정할 가족 구성원을 찾을 수 없습니다.', 'warning');
+      return;
+    }
+
     elements.memberForm.reset();
+    editingMemberId = member ? member.id : null;
     elements.memberBirthDate.max = localDateString();
+
+    if (member) {
+      elements.memberName.value = member.name;
+      elements.memberForm.elements.namedItem('relationship').value = member.relationship;
+      elements.memberForm.elements.namedItem('birthDate').value = member.birthDate;
+      elements.memberForm.elements.namedItem('bloodType').value = member.bloodType;
+      elements.memberForm.elements.namedItem('allergies').value = member.allergies;
+      elements.memberForm.elements.namedItem('note').value = member.note;
+    }
+
+    elements.memberDialogTitle.textContent = member ? '가족 구성원 정보 수정' : '가족 구성원 등록';
+    elements.memberDialogIntro.textContent = member
+      ? '가족 구성원의 건강정보를 수정해 주세요.'
+      : '함께 건강을 챙길 가족의 기본 정보를 입력해 주세요.';
+    elements.memberFormSubmit.textContent = member ? '변경사항 저장' : '구성원 등록';
+
     if (typeof elements.memberDialog.showModal === 'function') {
       elements.memberDialog.showModal();
       window.setTimeout(() => elements.memberName.focus(), 0);
     } else {
+      editingMemberId = null;
       showToast('현재 브라우저에서는 등록 창을 열 수 없습니다. 최신 브라우저를 이용해 주세요.', 'warning');
     }
   }
@@ -555,26 +608,59 @@
       showToast('이름을 입력해 주세요.', 'warning');
       return;
     }
-    if (birthDate && !isISODate(birthDate)) {
+    if (birthDate && (!isISODate(birthDate) || birthDate > localDateString())) {
       showToast('생년월일을 확인해 주세요.', 'warning');
       return;
     }
 
-    const member = {
-      id: makeId(),
+    const isEditing = editingMemberId !== null;
+    const memberIndex = isEditing
+      ? state.members.findIndex((item) => item.id === editingMemberId)
+      : -1;
+
+    if (isEditing && memberIndex === -1) {
+      showToast('수정할 가족 구성원을 찾을 수 없습니다. 다시 선택해 주세요.', 'warning');
+      elements.memberDialog.close();
+      return;
+    }
+
+    const memberFields = {
       name: name.slice(0, 40),
       relationship: RELATIONSHIPS.has(relationship) ? relationship : '기타',
       birthDate,
       bloodType: BLOOD_TYPES.has(bloodType) ? bloodType : 'unknown',
       allergies: formString(data, 'allergies').slice(0, 160),
-      note: formString(data, 'note').slice(0, 500),
-      createdAt: new Date().toISOString()
+      note: formString(data, 'note').slice(0, 500)
     };
+    const duplicateMember = state.members.find((item) =>
+      item.id !== editingMemberId &&
+      normalizeMemberName(item.name) === normalizeMemberName(memberFields.name)
+    );
 
-    state.members.push(member);
+    if (duplicateMember) {
+      elements.memberName.focus();
+      showToast('같은 이름의 가족 구성원이 이미 등록되어 있습니다. 이름을 구분해 입력해 주세요.', 'warning');
+      return;
+    }
+
+    let member;
+    if (isEditing) {
+      member = { ...state.members[memberIndex], ...memberFields };
+      state.members[memberIndex] = member;
+    } else {
+      member = {
+        id: makeId(),
+        ...memberFields,
+        createdAt: new Date().toISOString()
+      };
+      state.members.push(member);
+    }
+
     selectedMemberId = member.id;
     elements.memberDialog.close();
-    saveRenderAndNotify(`${member.name} 구성원을 등록했습니다.`);
+    saveRenderAndNotify(isEditing
+      ? `${member.name} 구성원 정보를 수정했습니다.`
+      : `${member.name} 구성원을 등록했습니다.`);
   }
 
   function handleRecordSubmit(event) {
@@ -633,10 +719,34 @@
     saveRenderAndNotify('병원·복약 일정을 저장했습니다.');
   }
 
+  function handleDeleteMember(id) {
+    const member = state.members.find((item) => item.id === id);
+    if (!member) return;
+
+    const recordCount = state.records.filter((record) => record.memberId === member.id).length;
+    const scheduleCount = state.schedules.filter((schedule) => schedule.memberId === member.id).length;
+    const linkedItems = [];
+    if (recordCount > 0) linkedItems.push(`건강 기록 ${recordCount}건`);
+    if (scheduleCount > 0) linkedItems.push(`병원·복약 일정 ${scheduleCount}건`);
+    const linkedWarning = linkedItems.length
+      ? `\n\n연결된 ${linkedItems.join(' 및 ')}도 함께 삭제됩니다.`
+      : '';
+
+    if (!confirmDeletion(`“${member.name}” 구성원을 삭제할까요?${linkedWarning}\n\n삭제 후에는 되돌릴 수 없습니다.`)) return;
+
+    state.members = state.members.filter((item) => item.id !== member.id);
+    state.records = state.records.filter((record) => record.memberId !== member.id);
+    state.schedules = state.schedules.filter((schedule) => schedule.memberId !== member.id);
+    if (selectedMemberId === member.id) {
+      selectedMemberId = state.members.length ? state.members[0].id : null;
+    }
+    saveRenderAndNotify(`${member.name} 구성원을 삭제했습니다.`);
+  }
+
   function handleDeleteRecord(id) {
     const record = state.records.find((item) => item.id === id && item.memberId === selectedMemberId);
     if (!record) return;
-    if (!window.confirm(`“${record.title}” 건강 기록을 삭제할까요?`)) return;
+    if (!confirmDeletion(`“${record.title}” 건강 기록을 삭제할까요?`)) return;
     state.records = state.records.filter((item) => item.id !== id);
     saveRenderAndNotify('건강 기록을 삭제했습니다.');
   }
@@ -644,7 +754,7 @@
   function handleDeleteSchedule(id) {
     const schedule = state.schedules.find((item) => item.id === id && item.memberId === selectedMemberId);
     if (!schedule) return;
-    if (!window.confirm(`“${schedule.title}” 일정을 삭제할까요?`)) return;
+    if (!confirmDeletion(`“${schedule.title}” 일정을 삭제할까요?`)) return;
     state.schedules = state.schedules.filter((item) => item.id !== id);
     saveRenderAndNotify('일정을 삭제했습니다.');
   }
@@ -660,6 +770,11 @@
       return;
     }
 
+    if (action === 'edit-member') {
+      openMemberDialog(button.dataset.id);
+      return;
+    }
+
     if (action === 'close-member-dialog') {
       elements.memberDialog.close();
     } else if (action === 'toggle-form') {
@@ -667,6 +782,8 @@
       setFormOpen(button.dataset.form, !isOpen);
     } else if (action === 'close-form') {
       setFormOpen(button.dataset.form, false);
+    } else if (action === 'delete-member') {
+      handleDeleteMember(button.dataset.id);
     } else if (action === 'delete-record') {
       handleDeleteRecord(button.dataset.id);
     } else if (action === 'delete-schedule') {
@@ -676,6 +793,9 @@
 
   function initialize() {
     updateTodayLabel();
+    elements.memberName.addEventListener('invalid', () => {
+      if (!elements.memberName.value.trim()) showToast('이름을 입력해 주세요.', 'warning');
+    });
     elements.familyList.addEventListener('click', (event) => {
       if (!(event.target instanceof Element)) return;
       const memberButton = event.target.closest('[data-member-id]');
@@ -694,6 +814,9 @@
     });
     elements.memberDialog.addEventListener('click', (event) => {
       if (event.target === elements.memberDialog) elements.memberDialog.close();
+    });
+    elements.memberDialog.addEventListener('close', () => {
+      editingMemberId = null;
     });
     document.addEventListener('click', handleDocumentClick);
 
