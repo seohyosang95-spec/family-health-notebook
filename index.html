@@ -7,10 +7,13 @@
   <meta name="description" content="가족 구성원의 건강기록과 병원·복약 일정을 개인적으로 정리하는 건강수첩입니다. 의료 진단이나 치료를 제공하지 않습니다.">
   <title>다정한 건강수첩 · 우리 가족 건강관리</title>
   <link rel="stylesheet" href="./styles.css">
-  <script src="./app.js" defer></script>
+  <link rel="stylesheet" href="./pin-lock.css">
+  <link rel="stylesheet" href="./backup.css">
+  <script src="./pin-lock.js" defer></script>
+  <script src="./backup-ui.js" defer></script>
 </head>
 <body>
-  <div class="app-shell">
+  <div id="app-shell" class="app-shell" hidden>
     <header class="topbar">
       <a class="brand" href="#main-content" aria-label="다정한 건강수첩 홈">
         <span class="brand-mark" aria-hidden="true">
@@ -30,6 +33,7 @@
           <span class="status-dot" aria-hidden="true"></span>
           <span id="storage-status">이 기기에 저장</span>
         </span>
+        <button id="lock-app-button" class="lock-app-button" type="button">지금 잠금</button>
       </div>
     </header>
 
