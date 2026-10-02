@@ -1,6 +1,7 @@
-/* PIN 화면과 앱 잠금 버튼 */
+/* 이 기기용 보호자 프로필과 잠금 화면 */
 [hidden] { display: none !important; }
-.lock-app-button {
+.lock-app-button,
+.guardian-settings-button {
   min-height: 36px;
   padding: 0 13px;
   border: 1px solid #dce9e0;
@@ -12,7 +13,21 @@
   font-size: 12px;
   font-weight: 700;
 }
-.lock-app-button:hover { background: #f0f7f2; }
+.lock-app-button:hover,
+.guardian-settings-button:hover { background: #f0f7f2; }
+.guardian-badge {
+  max-width: 180px;
+  overflow: hidden;
+  padding: 7px 10px;
+  border: 1px solid #e2ebe5;
+  border-radius: 999px;
+  background: #f6faf7;
+  color: #59766a;
+  font-size: 11px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .pin-gate {
   position: fixed;
   z-index: 1000;
@@ -24,7 +39,7 @@
   background: radial-gradient(ellipse at 90% 0%, #e7f3e9, transparent 28rem), #f5f8f6;
 }
 .pin-card {
-  width: min(100%, 430px);
+  width: min(100%, 450px);
   padding: 32px;
   border: 1px solid #e3ebe5;
   border-radius: 22px;
@@ -41,12 +56,12 @@
   color: #397b6b;
   font-size: 26px;
 }
-.pin-eyebrow { margin: 17px 0 3px; color: #6d8d79; font-size: 12px; font-weight: 700; letter-spacing: .08em; }
+.pin-eyebrow { margin: 17px 0 3px; color: #6d8d79; font-size: 12px; font-weight: 700; letter-spacing: .04em; line-height: 1.55; }
 .pin-card h1 { margin: 0; color: #203530; font-size: 24px; letter-spacing: -.05em; }
-.pin-description { margin: 8px 0 22px; color: #74827b; font-size: 14px; }
-.pin-form { display: grid; gap: 13px; }
+.pin-description { margin: 8px 0 22px; color: #74827b; font-size: 14px; line-height: 1.65; }
+.pin-form, .guardian-settings-form { display: grid; gap: 13px; }
 .pin-field { display: grid; gap: 7px; color: #56675e; font-size: 13px; font-weight: 650; }
-.pin-field input {
+.pin-field input, .pin-field select {
   width: 100%;
   min-height: 52px;
   padding: 10px 14px;
@@ -54,23 +69,87 @@
   border-radius: 11px;
   background: #fff;
   color: #203530;
+  font-size: 16px;
+  letter-spacing: .02em;
+}
+#pin-input, #pin-confirm, #guardian-current-pin, #guardian-new-pin, #guardian-new-pin-confirm {
   font-size: 22px;
   letter-spacing: .48em;
   text-align: center;
 }
-.pin-field input:focus { border-color: #78a58b; outline: 3px solid #397b6b24; }
-.pin-error { min-height: 0; margin: -4px 0 0; color: #a64c42; font-size: 13px; }
+.pin-field input:focus, .pin-field select:focus { border-color: #78a58b; outline: 3px solid #397b6b24; }
+.pin-error { min-height: 0; margin: -4px 0 0; color: #a64c42; font-size: 13px; line-height: 1.55; }
 .pin-error:empty { display: none; }
 .pin-error.is-visible { display: block; }
 .pin-submit { min-height: 48px; border: 0; border-radius: 11px; background: #397b6b; color: #fff; cursor: pointer; font: inherit; font-weight: 700; }
 .pin-submit:hover { background: #286656; }
 .pin-submit:disabled { cursor: wait; opacity: .7; }
+.forgot-pin-button {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 12px;
+  padding: 8px 10px;
+  border: 1px solid #f0d8ce;
+  border-radius: 10px;
+  background: #fff8f4;
+  color: #9b5847;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+}
+.forgot-pin-button:hover { background: #fff0e8; }
+.forgot-pin-button:disabled { cursor: wait; opacity: .65; }
 .pin-security-note { margin: 17px 0 0; color: #7b857f; font-size: 11px; line-height: 1.7; }
+.guardian-settings-dialog {
+  width: min(540px, calc(100vw - 28px));
+  max-width: 540px;
+  max-height: min(92vh, 850px);
+  overflow-y: auto;
+  padding: 0;
+  border: 1px solid #e0e9e2;
+  border-radius: 20px;
+  background: #fff;
+  color: #203530;
+  box-shadow: 0 24px 70px #1a342833;
+}
+.guardian-settings-dialog::backdrop { background: #1c2d2552; backdrop-filter: blur(3px); }
+.guardian-settings-card { padding: 24px; }
+.guardian-settings-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 17px; }
+.guardian-settings-heading .pin-eyebrow { margin: 0 0 3px; }
+.guardian-settings-heading h2 { margin: 0; color: #2e463a; font-size: 21px; letter-spacing: -.05em; }
+.guardian-close-button { width: 40px; height: 40px; border: 1px solid #e8ede9; border-radius: 11px; background: #fbfcfb; color: #75837b; cursor: pointer; font: inherit; font-size: 23px; }
+.guardian-settings-form h3 { margin: 0; color: #34483f; font-size: 16px; }
+.guardian-settings-form .pin-submit { min-height: 44px; }
+.guardian-settings-card hr { height: 1px; margin: 20px 0; border: 0; background: #edf1ee; }
+.guardian-settings-status { min-height: 0; margin: 0; color: #53705e; font-size: 12px; line-height: 1.6; }
+.guardian-settings-status:empty { display: none; }
+.guardian-settings-status.is-error { color: #a04f40; }
+.guardian-reset-note { margin: 19px 0 0; padding: 12px; border: 1px solid #f0dfd1; border-radius: 11px; background: #fff9f3; color: #765f4d; font-size: 11px; line-height: 1.7; }
+.guardian-reset-note strong { color: #674b36; }
+@media (max-width: 760px) {
+  .topbar-right { gap: 6px; }
+  .guardian-badge { max-width: 125px; padding: 6px 8px; font-size: 10px; }
+  .lock-app-button, .guardian-settings-button { padding: 0 9px; font-size: 10px; }
+}
 @media (max-width: 580px) {
-  .lock-app-button { min-height: 40px; padding: 0 10px; font-size: 11px; }
+  .lock-app-button, .guardian-settings-button { min-height: 40px; padding: 0 8px; font-size: 10px; }
+  .guardian-badge { max-width: 105px; font-size: 9px; }
   .pin-card { padding: 25px 21px; border-radius: 19px; }
   .pin-card h1 { font-size: 22px; }
   .pin-description { font-size: 13px; }
-  .pin-field input { font-size: 20px; }
+  #pin-input, #pin-confirm, #guardian-current-pin, #guardian-new-pin, #guardian-new-pin-confirm { font-size: 20px; }
   .pin-submit { min-height: 50px; }
+  .guardian-settings-card { padding: 19px 16px; }
+  .guardian-settings-heading h2 { font-size: 20px; }
+  .guardian-settings-form .pin-field { font-size: 13px; }
+  .guardian-settings-form .pin-field input, .guardian-settings-form .pin-field select { min-height: 48px; font-size: 16px; }
+  .guardian-settings-form #guardian-current-pin, .guardian-settings-form #guardian-new-pin, .guardian-settings-form #guardian-new-pin-confirm { font-size: 20px; }
+  .guardian-reset-note { font-size: 12px; }
+}
+@media (max-width: 420px) {
+  .topbar-right { gap: 4px; }
+  .guardian-badge { max-width: 83px; padding: 5px 6px; font-size: 8px; }
+  .lock-app-button, .guardian-settings-button { padding: 0 6px; font-size: 9px; }
+  .storage-pill { padding: 0 6px; font-size: 8px; }
 }
